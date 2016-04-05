@@ -39,12 +39,12 @@ public class CrimeExpandableAdapter extends ExpandableRecyclerAdapter {
     }
 
     @Override
-    public CrimeChildViewHolder onCreateChildViewHolder(ViewGroup viewGroup, int viewType) {
+    public ChildViewHolder onCreateChildViewHolder(ViewGroup viewGroup, int viewType) {
         View view;
         switch (viewType) {
             case VIEW_TYPE_CRIME_DETAIL:
-                view = mInflater.inflate(R.layout.list_item_crime_child, viewGroup, false);
-                return new CrimeChildViewHolder(view);
+                view = mInflater.inflate(R.layout.list_item_crime_child_detail, viewGroup, false);
+                return new CrimeChildDetailViewHolder(view);
             default:
                 view = mInflater.inflate(R.layout.list_item_crime_child, viewGroup, false);
                 return new CrimeChildViewHolder(view);
@@ -64,10 +64,14 @@ public class CrimeExpandableAdapter extends ExpandableRecyclerAdapter {
 
     @Override
     public void onBindChildViewHolder(ChildViewHolder childViewHolder, int position, Object childListItem) {
-        CrimeChild crimeChild = (CrimeChild) childListItem;
-        CrimeChildViewHolder crimeChildViewHolder = (CrimeChildViewHolder) childViewHolder;
-        crimeChildViewHolder.mCrimeDateText.setText(crimeChild.getDate().toString());
-        crimeChildViewHolder.mCrimeSolvedCheckBox.setChecked(crimeChild.isSolved());
+        if (childViewHolder instanceof CrimeChildViewHolder) {
+            CrimeChild crimeChild = (CrimeChild) childListItem;
+            ((CrimeChildViewHolder) childViewHolder).mCrimeDateText.setText(crimeChild.getDate().toString());
+            ((CrimeChildViewHolder) childViewHolder).mCrimeSolvedCheckBox.setChecked(crimeChild.isSolved());
+        } else if (childViewHolder instanceof CrimeChildDetailViewHolder) {
+            CrimeChildDetail crimeChildDetail = (CrimeChildDetail) childListItem;
+            ((CrimeChildDetailViewHolder) childViewHolder).mCrimeDetailText.setText(crimeChildDetail.getDetail());
+        }
     }
 
 }

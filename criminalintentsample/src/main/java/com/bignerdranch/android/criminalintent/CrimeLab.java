@@ -32,6 +32,7 @@ public class CrimeLab {
                 Felony crime = new Felony();
                 crime.setTitle("Felony #" + i);
                 crime.setSolved(i % 2 == 0);
+                crime.setDetail("Details");
                 mCrimes.add(crime);
             }
         }

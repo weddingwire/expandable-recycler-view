@@ -10,6 +10,7 @@ public class Crime implements ParentListItem {
 
     private UUID mId;
     private String mTitle;
+    private String mDetail;
     private Date mDate;
     private boolean mSolved;
     private List<CrimeChild> mChildItemList;
@@ -59,5 +60,13 @@ public class Crime implements ParentListItem {
     @Override
     public boolean isInitiallyExpanded() {
         return false;
+    }
+
+    public String getDetail() {
+        return mDetail;
+    }
+
+    public void setDetail(String detail) {
+        mDetail = detail;
     }
 }
