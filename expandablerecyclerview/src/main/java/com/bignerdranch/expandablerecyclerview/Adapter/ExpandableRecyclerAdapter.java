@@ -286,28 +286,36 @@ public abstract class ExpandableRecyclerAdapter
     public int getItemViewType(int position) {
         Object listItem = getListItem(position);
         if (listItem instanceof ParentWrapper) {
-            int returnType = TYPE_PARENT;
-            for (int i = 0; i < mParentTypes.size(); i++) {
-                ParentType parentType = mParentTypes.get(i);
-                Class type = parentType.classModel;
-                if (type.isInstance(((ParentWrapper) listItem).getParentListItem())) {
-                    returnType = parentType.type;
-                }
-            }
-            return returnType;
+            return getParentViewType((ParentWrapper) listItem);
         } else if (listItem == null) {
             throw new IllegalStateException("Null object added");
         } else {
-            int returnType = TYPE_CHILD;
-            for (int i = 0; i < mChildTypes.size(); i++) {
-                ChildType childType = mChildTypes.get(i);
-                Class type = mChildTypes.get(i).classModel;
-                if (type.isInstance(listItem)) {
-                    returnType = childType.type;
-                }
-            }
-            return returnType;
+            return getChildViewType(listItem);
         }
+    }
+
+    private int getChildViewType(Object listItem) {
+        int returnType = TYPE_CHILD;
+        for (int i = 0; i < mChildTypes.size(); i++) {
+            ChildType childType = mChildTypes.get(i);
+            Class type = mChildTypes.get(i).classModel;
+            if (type.isInstance(listItem)) {
+                returnType = childType.type;
+            }
+        }
+        return returnType;
+    }
+
+    private int getParentViewType(ParentWrapper listItem) {
+        int returnType = TYPE_PARENT;
+        for (int i = 0; i < mParentTypes.size(); i++) {
+            ParentType parentType = mParentTypes.get(i);
+            Class type = parentType.classModel;
+            if (type.isInstance(listItem.getParentListItem())) {
+                returnType = parentType.type;
+            }
+        }
+        return returnType;
     }
 
     /**
