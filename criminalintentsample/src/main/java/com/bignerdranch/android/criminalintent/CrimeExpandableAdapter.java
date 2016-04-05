@@ -18,6 +18,7 @@ public class CrimeExpandableAdapter extends ExpandableRecyclerAdapter {
     private LayoutInflater mInflater;
 
     public static final int VIEW_TYPE_FELONY = 4;
+    public static final int VIEW_TYPE_CRIME_DETAIL = 5;
 
     public CrimeExpandableAdapter(Context context, List<ParentListItem> itemList) {
         super(itemList);
@@ -39,8 +40,15 @@ public class CrimeExpandableAdapter extends ExpandableRecyclerAdapter {
 
     @Override
     public CrimeChildViewHolder onCreateChildViewHolder(ViewGroup viewGroup, int viewType) {
-        View view = mInflater.inflate(R.layout.list_item_crime_child, viewGroup, false);
-        return new CrimeChildViewHolder(view);
+        View view;
+        switch (viewType) {
+            case VIEW_TYPE_CRIME_DETAIL:
+                view = mInflater.inflate(R.layout.list_item_crime_child, viewGroup, false);
+                return new CrimeChildViewHolder(view);
+            default:
+                view = mInflater.inflate(R.layout.list_item_crime_child, viewGroup, false);
+                return new CrimeChildViewHolder(view);
+        }
     }
 
     @Override
