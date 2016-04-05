@@ -23,7 +23,7 @@ import java.util.List;
  * @version 1.0
  * @since 5/27/2015
  */
-public class VerticalLinearRecyclerViewSampleActivity extends AppCompatActivity {
+public class VerticalLinearRecyclerViewSampleActivity extends AppCompatActivity{
 
     private RecipeAdapter mAdapter;
 

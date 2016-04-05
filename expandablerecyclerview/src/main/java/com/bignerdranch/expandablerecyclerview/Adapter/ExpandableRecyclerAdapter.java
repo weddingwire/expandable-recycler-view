@@ -92,34 +92,10 @@ public abstract class ExpandableRecyclerAdapter
     public ExpandableRecyclerAdapter(@NonNull List<? extends ParentListItem> parentItemList) {
         super();
         mParentItemList = parentItemList;
-        mItemList = generateParentChildItemList(parentItemList);
+        mItemList = ExpandableRecyclerAdapterHelper.generateParentChildItemList(parentItemList);
         mAttachedRecyclerViewPool = new ArrayList<>();
         mChildTypes = new ArrayList<>();
         mParentTypes = new ArrayList<>();
-    }
-
-    public static List<Object> generateParentChildItemList(List<? extends ParentListItem> parentItemList) {
-        List<Object> parentWrapperList = new ArrayList<>();
-        ParentListItem parentListItem;
-        ParentWrapper parentWrapper;
-
-        int parentListItemCount = parentItemList.size();
-        for (int i = 0; i < parentListItemCount; i++) {
-            parentListItem = parentItemList.get(i);
-            parentWrapper = new ParentWrapper(parentListItem);
-            parentWrapperList.add(parentWrapper);
-
-            if (parentWrapper.isInitiallyExpanded()) {
-                parentWrapper.setExpanded(true);
-
-                int childListItemCount = parentWrapper.getChildItemList().size();
-                for (int j = 0; j < childListItemCount; j++) {
-                    parentWrapperList.add(parentWrapper.getChildItemList().get(j));
-                }
-            }
-        }
-
-        return parentWrapperList;
     }
 
     /**
@@ -130,9 +106,9 @@ public abstract class ExpandableRecyclerAdapter
      *
      * @param viewGroup The {@link ViewGroup} into which the new {@link android.view.View}
      *                  will be added after it is bound to an adapter position.
-     * @param viewType  The view type of the new {@code android.view.View}.
+     * @param viewType The view type of the new {@code android.view.View}.
      * @return A new RecyclerView.ViewHolder
-     * that holds a {@code android.view.View} of the given view type.
+     *         that holds a {@code android.view.View} of the given view type.
      */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -329,6 +305,7 @@ public abstract class ExpandableRecyclerAdapter
      * {@link #notifyChildItemRemoved(int, int)}
      * {@link #notifyChildItemChanged(int, int)}
      * methods.
+     *
      *
      * @return The list of ParentListItems that this adapter represents
      */
@@ -1252,7 +1229,7 @@ public abstract class ExpandableRecyclerAdapter
      *
      * @param parentListItem A ParentListItem in the list of parents
      * @return If the parent exists on the list, returns its ParentWrapper.
-     * Otherwise, returns null.
+     *         Otherwise, returns null.
      */
     private ParentWrapper getParentWrapper(ParentListItem parentListItem) {
         int listItemCount = mItemList.size();
