@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="5dp"
+    android:paddingTop="5dp"
+    android:background="@drawable/abc_list_selector_background_transition_holo_light">
+
+    <TextView
+        android:id="@+id/parent_list_item_felony_title_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_alignParentTop="true"
+        android:textSize="10sp"
+        android:paddingLeft="16dp"
+        android:paddingBottom="2dp"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:text="Felony" />
+
+    <TextView
+        android:id="@+id/parent_list_item_crime_title_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_red_dark"
+        android:paddingLeft="16dp"
+        android:textStyle="bold"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:text="Felony Title"
+        android:layout_below="@id/parent_list_item_felony_title_label"/>
+
+    <ImageButton
+        android:id="@+id/parent_list_item_expand_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_margin="8dp"
+        android:src="@android:drawable/arrow_down_float" />
+
+</RelativeLayout>

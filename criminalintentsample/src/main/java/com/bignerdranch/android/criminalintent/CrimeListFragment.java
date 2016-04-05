@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentListItem;
+import com.bignerdranch.expandablerecyclerview.Model.ParentType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,10 @@ public class CrimeListFragment extends Fragment {
 
         CrimeExpandableAdapter crimeExpandableAdapter = new CrimeExpandableAdapter(getActivity(), generateCrimes());
         crimeExpandableAdapter.onRestoreInstanceState(savedInstanceState);
+
+        List<ParentType> parentTypes = new ArrayList();
+        parentTypes.add(new ParentType(CrimeExpandableAdapter.VIEW_TYPE_FELONY, Felony.class));
+        crimeExpandableAdapter.addParentViewTypes(parentTypes);
 
         mCrimeRecyclerView.setAdapter(crimeExpandableAdapter);
 
