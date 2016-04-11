@@ -123,19 +123,27 @@ public abstract class ExpandableRecyclerAdapter
         }
     }
 
+    /**
+     * Add the available types for the parent views.
+     * @param parentTypeList List of {@link ParentType} items. Items with types of 0 are reserved.
+     */
     public void addParentViewTypes(List<ParentType> parentTypeList) {
         for (ParentType parent : parentTypeList) {
             if (parent.type == 0 || parent.type == 1) {
-                throw new IllegalStateException("Invalid view type numbers. Cannot use 0 or 1.");
+                throw new IllegalStateException("Invalid view type numbers. Cannot use 0.");
             }
         }
         mParentTypes.addAll(parentTypeList);
     }
 
+    /**
+     * Add the available types for the child views.
+     * @param childTypeList List of {@link ChildType} items. Items with types of 1 are reserved.
+     */
     public void addChildViewTypes(List<ChildType> childTypeList) {
         for (ChildType child : childTypeList) {
             if (child.type == 0 || child.type == 1) {
-                throw new IllegalStateException("Invalid view type numbers. Cannot use 0 or 1.");
+                throw new IllegalStateException("Invalid view type numbers. Cannot use 1.");
             }
         }
         mChildTypes.addAll(childTypeList);
