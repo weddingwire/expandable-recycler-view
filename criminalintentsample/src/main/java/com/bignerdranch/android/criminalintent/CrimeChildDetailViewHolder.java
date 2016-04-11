@@ -5,9 +5,6 @@ import android.widget.TextView;
 
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 
-/**
- * Created by ryanbrooks on 6/17/15.
- */
 public class CrimeChildDetailViewHolder extends ChildViewHolder {
 
     public TextView mCrimeDetailText;

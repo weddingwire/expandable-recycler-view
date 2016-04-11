@@ -2,10 +2,7 @@ package com.bignerdranch.android.criminalintent;
 
 import java.util.Date;
 
-/**
- * Created by ryanbrooks on 6/17/15.
- */
-public class CrimeChildDetail extends CrimeChild{
+public class CrimeChildDetail extends CrimeChild {
 
     private String mDetail;
 
