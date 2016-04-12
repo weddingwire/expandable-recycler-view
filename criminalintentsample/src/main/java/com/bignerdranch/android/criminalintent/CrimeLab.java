@@ -22,6 +22,7 @@ public class CrimeLab {
     private CrimeLab(Context context) {
         mCrimes = new ArrayList<>();
         Random ran = new Random();
+        //randomly intersperse different types of crimes
         for (int i = 0; i < 100; i++) {
             if(i % (ran.nextInt(3) + 1) == 0) {
                 Crime crime = new Crime();

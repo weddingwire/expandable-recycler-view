@@ -206,7 +206,7 @@ public abstract class ExpandableRecyclerAdapter
      *
      * @param parentViewGroup The {@link ViewGroup} in the list for which a {@link ParentViewHolder}
      *                        is being created
-     * @return A {@code PVH} corresponding to the {@link ParentListItem} with
+     * @return A {@code ParentViewHolder} corresponding to the {@link ParentListItem} with
      * the {@code ViewGroup} parentViewGroup
      */
     public abstract ParentViewHolder onCreateParentViewHolder(ViewGroup parentViewGroup, int viewType);
@@ -217,7 +217,7 @@ public abstract class ExpandableRecyclerAdapter
      *
      * @param childViewGroup The {@link ViewGroup} in the list for which a {@link ChildViewHolder}
      *                       is being created
-     * @return A {@code CVH} corresponding to the child list item with the
+     * @return A {@code ChildViewHolder to the child list item with the
      * {@code ViewGroup} childViewGroup
      */
     public abstract ChildViewHolder onCreateChildViewHolder(ViewGroup childViewGroup, int viewType);
@@ -228,10 +228,10 @@ public abstract class ExpandableRecyclerAdapter
      * <p>
      * Bind data to the {@link ParentViewHolder} here.
      *
-     * @param parentViewHolder The {@code PVH} to bind data to
+     * @param parentViewHolder The {@code ParentViewHolder} to bind data to
      * @param position The index in the list at which to bind
      * @param parentListItem The {@link ParentListItem} which holds the data to
-     *                       be bound to the {@code PVH}
+     *                       be bound to the {@code ParentViewHolder}
      */
     public abstract void onBindParentViewHolder(ParentViewHolder parentViewHolder, int position, ParentListItem parentListItem);
 
@@ -241,10 +241,10 @@ public abstract class ExpandableRecyclerAdapter
      * <p>
      * Bind data to the {@link ChildViewHolder} here.
      *
-     * @param childViewHolder The {@code CVH} to bind data to
+     * @param childViewHolder The {@code ChildViewHolder} to bind data to
      * @param position The index in the list at which to bind
      * @param childListItem The child list item which holds that data to be
-     *                      bound to the {@code CVH}
+     *                      bound to the {@code ChildViewHolder}
      */
     public abstract void onBindChildViewHolder(ChildViewHolder childViewHolder, int position, Object childListItem);
 
