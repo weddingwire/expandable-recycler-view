@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class CrimeLab {
@@ -20,11 +21,21 @@ public class CrimeLab {
 
     private CrimeLab(Context context) {
         mCrimes = new ArrayList<>();
+        Random ran = new Random();
+        //randomly intersperse different types of crimes
         for (int i = 0; i < 100; i++) {
-            Crime crime = new Crime();
-            crime.setTitle("Crime #" + i);
-            crime.setSolved(i % 2 == 0);
-            mCrimes.add(crime);
+            if(i % (ran.nextInt(3) + 1) == 0) {
+                Crime crime = new Crime();
+                crime.setTitle("Crime #" + i);
+                crime.setSolved(i % 2 == 0);
+                mCrimes.add(crime);
+            } else {
+                Felony crime = new Felony();
+                crime.setTitle("Felony #" + i);
+                crime.setSolved(i % 2 == 0);
+                crime.setDetail("Details");
+                mCrimes.add(crime);
+            }
         }
     }
 

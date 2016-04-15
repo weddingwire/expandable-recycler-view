@@ -6,7 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.bignerdranch.expandablerecyclerview.Model.ChildType;
 import com.bignerdranch.expandablerecyclerview.Model.ParentListItem;
+import com.bignerdranch.expandablerecyclerview.Model.ParentType;
 import com.bignerdranch.expandablerecyclerview.Model.ParentWrapper;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
@@ -33,7 +35,7 @@ import java.util.List;
  * @version 1.0
  * @since 5/27/2015
  */
-public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CVH extends ChildViewHolder>
+public abstract class ExpandableRecyclerAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ParentViewHolder.ParentListItemExpandCollapseListener {
 
     private static final String EXPANDED_STATE_MAP = "ExpandableRecyclerAdapter.ExpandedStateMap";
@@ -50,6 +52,8 @@ public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CV
     private List<? extends ParentListItem> mParentItemList;
     private ExpandCollapseListener mExpandCollapseListener;
     private List<RecyclerView> mAttachedRecyclerViewPool;
+    private List<ChildType> mChildTypes;
+    private List<ParentType> mParentTypes;
 
     /**
      * Allows objects to register themselves as expand/collapse listeners to be
@@ -90,13 +94,15 @@ public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CV
         mParentItemList = parentItemList;
         mItemList = ExpandableRecyclerAdapterHelper.generateParentChildItemList(parentItemList);
         mAttachedRecyclerViewPool = new ArrayList<>();
+        mChildTypes = new ArrayList<>();
+        mParentTypes = new ArrayList<>();
     }
 
     /**
      * Implementation of Adapter.onCreateViewHolder(ViewGroup, int)
      * that determines if the list item is a parent or a child and calls through
-     * to the appropriate implementation of either {@link #onCreateParentViewHolder(ViewGroup)}
-     * or {@link #onCreateChildViewHolder(ViewGroup)}.
+     * to the appropriate implementation of either {@link #onCreateParentViewHolder(ViewGroup, int)}
+     * or {@link #onCreateChildViewHolder(ViewGroup, int)}.
      *
      * @param viewGroup The {@link ViewGroup} into which the new {@link android.view.View}
      *                  will be added after it is bound to an adapter position.
@@ -106,15 +112,61 @@ public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CV
      */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        if (viewType == TYPE_PARENT) {
-            PVH pvh = onCreateParentViewHolder(viewGroup);
+        if (isParentViewHolder(viewType)) {
+            ParentViewHolder pvh = onCreateParentViewHolder(viewGroup, viewType);
             pvh.setParentListItemExpandCollapseListener(this);
             return pvh;
-        } else if (viewType == TYPE_CHILD) {
-            return onCreateChildViewHolder(viewGroup);
+        } else if (isChildViewHolder(viewType)) {
+            return onCreateChildViewHolder(viewGroup, viewType);
         } else {
             throw new IllegalStateException("Incorrect ViewType found");
         }
+    }
+
+    /**
+     * Add the available types for the parent views.
+     * @param parentTypeList List of {@link ParentType} items. Items with types of 0 are reserved.
+     */
+    public void addParentViewTypes(List<ParentType> parentTypeList) {
+        for (ParentType parent : parentTypeList) {
+            if (parent.type == 0 || parent.type == 1) {
+                throw new IllegalStateException("Invalid view type numbers. Cannot use 0.");
+            }
+        }
+        mParentTypes.addAll(parentTypeList);
+    }
+
+    /**
+     * Add the available types for the child views.
+     * @param childTypeList List of {@link ChildType} items. Items with types of 1 are reserved.
+     */
+    public void addChildViewTypes(List<ChildType> childTypeList) {
+        for (ChildType child : childTypeList) {
+            if (child.type == 0 || child.type == 1) {
+                throw new IllegalStateException("Invalid view type numbers. Cannot use 1.");
+            }
+        }
+        mChildTypes.addAll(childTypeList);
+    }
+
+    private boolean isParentViewHolder(int viewType) {
+        boolean isParent = viewType == TYPE_PARENT;
+        for (int i = 0; i < mParentTypes.size(); i++) {
+            if (viewType == mParentTypes.get(i).type) {
+                isParent = true;
+            }
+        }
+        return isParent;
+    }
+
+    private boolean isChildViewHolder(int viewType) {
+        boolean isChild = viewType == TYPE_CHILD;
+        for (int i = 0; i < mChildTypes.size(); i++) {
+            if (viewType == mChildTypes.get(i).type) {
+                isChild = true;
+            }
+        }
+        return isChild;
     }
 
     /**
@@ -132,7 +184,7 @@ public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CV
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         Object listItem = getListItem(position);
         if (listItem instanceof ParentWrapper) {
-            PVH parentViewHolder = (PVH) holder;
+            ParentViewHolder parentViewHolder = (ParentViewHolder) holder;
 
             if (parentViewHolder.shouldItemViewClickToggleExpansion()) {
                 parentViewHolder.setMainItemClickToExpand();
@@ -144,7 +196,7 @@ public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CV
         } else if (listItem == null) {
             throw new IllegalStateException("Incorrect ViewHolder found");
         } else {
-            onBindChildViewHolder((CVH) holder, position, listItem);
+            onBindChildViewHolder((ChildViewHolder) holder, position, listItem);
         }
     }
 
@@ -152,49 +204,49 @@ public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CV
      * Callback called from {@link #onCreateViewHolder(ViewGroup, int)} when
      * the list item created is a parent.
      *
-     * @param parentViewGroup The {@link ViewGroup} in the list for which a {@link PVH}
+     * @param parentViewGroup The {@link ViewGroup} in the list for which a {@link ParentViewHolder}
      *                        is being created
-     * @return A {@code PVH} corresponding to the {@link ParentListItem} with
-     *         the {@code ViewGroup} parentViewGroup
+     * @return A {@code ParentViewHolder} corresponding to the {@link ParentListItem} with
+     * the {@code ViewGroup} parentViewGroup
      */
-    public abstract PVH onCreateParentViewHolder(ViewGroup parentViewGroup);
+    public abstract ParentViewHolder onCreateParentViewHolder(ViewGroup parentViewGroup, int viewType);
 
     /**
      * Callback called from {@link #onCreateViewHolder(ViewGroup, int)} when
      * the list item created is a child.
      *
-     * @param childViewGroup The {@link ViewGroup} in the list for which a {@link CVH}
+     * @param childViewGroup The {@link ViewGroup} in the list for which a {@link ChildViewHolder}
      *                       is being created
-     * @return A {@code CVH} corresponding to the child list item with the
-     *         {@code ViewGroup} childViewGroup
+     * @return A {@code ChildViewHolder to the child list item with the
+     * {@code ViewGroup} childViewGroup
      */
-    public abstract CVH onCreateChildViewHolder(ViewGroup childViewGroup);
+    public abstract ChildViewHolder onCreateChildViewHolder(ViewGroup childViewGroup, int viewType);
 
     /**
      * Callback called from onBindViewHolder(RecyclerView.ViewHolder, int)
      * when the list item bound to is a parent.
      * <p>
-     * Bind data to the {@link PVH} here.
+     * Bind data to the {@link ParentViewHolder} here.
      *
-     * @param parentViewHolder The {@code PVH} to bind data to
+     * @param parentViewHolder The {@code ParentViewHolder} to bind data to
      * @param position The index in the list at which to bind
      * @param parentListItem The {@link ParentListItem} which holds the data to
-     *                       be bound to the {@code PVH}
+     *                       be bound to the {@code ParentViewHolder}
      */
-    public abstract void onBindParentViewHolder(PVH parentViewHolder, int position, ParentListItem parentListItem);
+    public abstract void onBindParentViewHolder(ParentViewHolder parentViewHolder, int position, ParentListItem parentListItem);
 
     /**
      * Callback called from onBindViewHolder(RecyclerView.ViewHolder, int)
      * when the list item bound to is a child.
      * <p>
-     * Bind data to the {@link CVH} here.
+     * Bind data to the {@link ChildViewHolder} here.
      *
-     * @param childViewHolder The {@code CVH} to bind data to
+     * @param childViewHolder The {@code ChildViewHolder} to bind data to
      * @param position The index in the list at which to bind
      * @param childListItem The child list item which holds that data to be
-     *                      bound to the {@code CVH}
+     *                      bound to the {@code ChildViewHolder}
      */
-    public abstract void onBindChildViewHolder(CVH childViewHolder, int position, Object childListItem);
+    public abstract void onBindChildViewHolder(ChildViewHolder childViewHolder, int position, Object childListItem);
 
     /**
      * Gets the number of parent and child objects currently expanded.
@@ -210,20 +262,44 @@ public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CV
      * Gets the view type of the item at the given position.
      *
      * @param position The index in the list to get the view type of
-     * @return {@value #TYPE_PARENT} for {@link ParentListItem} and {@value #TYPE_CHILD}
-     *         for child list items
+     * @return {@value #TYPE_PARENT} for {@link ParentListItem}, {@value #TYPE_CHILD}
+     * for child list items, or a custom value
      * @throws IllegalStateException if the item at the given position in the list is null
      */
     @Override
     public int getItemViewType(int position) {
         Object listItem = getListItem(position);
         if (listItem instanceof ParentWrapper) {
-            return TYPE_PARENT;
+            return getParentViewType((ParentWrapper) listItem);
         } else if (listItem == null) {
             throw new IllegalStateException("Null object added");
         } else {
-            return TYPE_CHILD;
+            return getChildViewType(listItem);
         }
+    }
+
+    private int getChildViewType(Object listItem) {
+        int returnType = TYPE_CHILD;
+        for (int i = 0; i < mChildTypes.size(); i++) {
+            ChildType childType = mChildTypes.get(i);
+            Class type = mChildTypes.get(i).classModel;
+            if (type.isInstance(listItem)) {
+                returnType = childType.type;
+            }
+        }
+        return returnType;
+    }
+
+    private int getParentViewType(ParentWrapper listItem) {
+        int returnType = TYPE_PARENT;
+        for (int i = 0; i < mParentTypes.size(); i++) {
+            ParentType parentType = mParentTypes.get(i);
+            Class type = parentType.classModel;
+            if (type.isInstance(listItem.getParentListItem())) {
+                returnType = parentType.type;
+            }
+        }
+        return returnType;
     }
 
     /**
@@ -320,7 +396,7 @@ public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CV
         Object listItem = getListItem(parentWrapperIndex);
         ParentWrapper parentWrapper;
         if (listItem instanceof ParentWrapper) {
-             parentWrapper = (ParentWrapper) listItem;
+            parentWrapper = (ParentWrapper) listItem;
         } else {
             return;
         }
@@ -518,9 +594,9 @@ public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CV
      * @param parentIndex The index of the parent to expand
      */
     private void expandViews(ParentWrapper parentWrapper, int parentIndex) {
-        PVH viewHolder;
+        ParentViewHolder viewHolder;
         for (RecyclerView recyclerView : mAttachedRecyclerViewPool) {
-            viewHolder = (PVH) recyclerView.findViewHolderForAdapterPosition(parentIndex);
+            viewHolder = (ParentViewHolder) recyclerView.findViewHolderForAdapterPosition(parentIndex);
             if (viewHolder != null && !viewHolder.isExpanded()) {
                 viewHolder.setExpanded(true);
                 viewHolder.onExpansionToggled(false);
@@ -540,9 +616,9 @@ public abstract class ExpandableRecyclerAdapter<PVH extends ParentViewHolder, CV
      * @param parentIndex The index of the parent to collapse
      */
     private void collapseViews(ParentWrapper parentWrapper, int parentIndex) {
-        PVH viewHolder;
+        ParentViewHolder viewHolder;
         for (RecyclerView recyclerView : mAttachedRecyclerViewPool) {
-            viewHolder = (PVH) recyclerView.findViewHolderForAdapterPosition(parentIndex);
+            viewHolder = (ParentViewHolder) recyclerView.findViewHolderForAdapterPosition(parentIndex);
             if (viewHolder != null && viewHolder.isExpanded()) {
                 viewHolder.setExpanded(false);
                 viewHolder.onExpansionToggled(true);

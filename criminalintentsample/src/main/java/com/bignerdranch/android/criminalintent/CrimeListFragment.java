@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bignerdranch.expandablerecyclerview.Model.ChildType;
 import com.bignerdranch.expandablerecyclerview.Model.ParentListItem;
+import com.bignerdranch.expandablerecyclerview.Model.ParentType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,14 @@ public class CrimeListFragment extends Fragment {
         CrimeExpandableAdapter crimeExpandableAdapter = new CrimeExpandableAdapter(getActivity(), generateCrimes());
         crimeExpandableAdapter.onRestoreInstanceState(savedInstanceState);
 
+        List<ParentType> parentTypes = new ArrayList();
+        parentTypes.add(new ParentType(CrimeExpandableAdapter.VIEW_TYPE_FELONY, Felony.class));
+        crimeExpandableAdapter.addParentViewTypes(parentTypes);
+
+        List<ChildType> childTypes = new ArrayList();
+        childTypes.add(new ChildType(CrimeExpandableAdapter.VIEW_TYPE_CRIME_DETAIL, CrimeChildDetail.class));
+        crimeExpandableAdapter.addChildViewTypes(childTypes);
+
         mCrimeRecyclerView.setAdapter(crimeExpandableAdapter);
 
         return view;
@@ -44,7 +54,11 @@ public class CrimeListFragment extends Fragment {
         List<ParentListItem> parentListItems = new ArrayList<>();
         for (Crime crime : crimes) {
             List<CrimeChild> childItemList = new ArrayList<>();
-            childItemList.add(new CrimeChild(crime.getDate(), crime.isSolved()));
+            if (crime.getDetail() != null) {
+                childItemList.add(new CrimeChildDetail(crime.getDate(), crime.isSolved(), crime.getDetail()));
+            } else {
+                childItemList.add(new CrimeChild(crime.getDate(), crime.isSolved()));
+            }
             crime.setChildItemList(childItemList);
             parentListItems.add(crime);
         }
